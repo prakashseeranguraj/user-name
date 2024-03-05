@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="AuthApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Authentication System</title>
+    <style>
+        /* Add your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 400px;
+            width: 100%;
+        }
+        input[type="text"],
+        input[type="password"],
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .message {
+            color: red;
+            margin-bottom: 10px;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script>
+        angular.module('AuthApp', [])
+            .controller('AuthController', function($scope) {
+                $scope.users = []; // Store registered users
+                $scope.currentUser = null;
+                $scope.loggedIn = false;
+                $scope.errorMsg = '';
+
+                $scope.signUp = function() {
+                    var newUser = {
+                        username: $scope.signupUsername,
+                        password: $scope.signupPassword
+                    };
+
+                    // Check if username already exists
+                    var userExists = $scope.users.some(function(user) {
+                        return user.username === newUser.username;
+                    });
+
+                    if (!userExists) {
+                        $scope.users.push(newUser);
+                        $scope.signupUsername = '';
+                        $scope.signupPassword = '';
+                        $scope.errorMsg = '';
+                    } else {
+                        $scope.errorMsg = 'Username already exists.';
+                    }
+                };
+
+                $scope.logIn = function() {
+                    var foundUser = $scope.users.find(function(user) {
+                        return user.username === $scope.loginUsername && user.password === $scope.loginPassword;
+                    });
+
+                    if (foundUser) {
+                        $scope.currentUser = foundUser.username;
+                        $scope.loggedIn = true;
+                        $scope.errorMsg = '';
+                    } else {
+                        $scope.errorMsg = 'Invalid username or password.';
+                    }
+                };
+
+                $scope.logOut = function() {
+                    $scope.currentUser = null;
+                    $scope.loggedIn = false;
+                    $scope.errorMsg = '';
+                };
+            });
+    </script>
+</head>
+<body ng-controller="AuthController">
+    <div class="container" ng-if="!loggedIn">
+        <h2>Sign Up</h2>
+        <input type="text" placeholder="Username" ng-model="signupUsername">
+        <input type="password" placeholder="Password" ng-model="signupPassword">
+        <button ng-click="signUp()">Sign Up</button>
+        <div class="message" ng-if="errorMsg">{{ errorMsg }}</div>
+
+        <h2>Log In</h2>
+        <input type="text" placeholder="Username" ng-model="loginUsername">
+        <input type="password" placeholder="Password" ng-model="loginPassword">
+        <button ng-click="logIn()">Log In</button>
+        <div class="message" ng-if="errorMsg">{{ errorMsg }}</div>
+    </div>
+
+    <div class="container" ng-if="loggedIn">
+        <h2>Welcome, {{ currentUser }}!</h2>
+        <button ng-click="logOut()">Log Out</button>
+    </div>
+</body>
+</html>
